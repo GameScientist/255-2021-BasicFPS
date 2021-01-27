@@ -31,7 +31,7 @@ public class Raycaster : MonoBehaviour
                 DoorController door = hit.transform.GetComponentInParent<DoorController>();
                 if(door != null)
                 {
-                    door.PlayerInteract();
+                    door.PlayerInteract(transform.parent.position);
                 }
             }
         }

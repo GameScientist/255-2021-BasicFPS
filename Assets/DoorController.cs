@@ -10,6 +10,10 @@ public class DoorController : MonoBehaviour
     private float animTimer = 0;
     private bool animIsPlaying = false;
     private float doorAngle;
+
+    private bool isClosed = true;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,15 +27,26 @@ public class DoorController : MonoBehaviour
 
         if (animIsPlaying)
         {
-            animTimer += Time.deltaTime; // playing the animation...
+            if (!isClosed)
+                animTimer += Time.deltaTime;
+            else
+                animTimer -= Time.deltaTime; // playing the animation...
 
             float percent = animTimer / animLength;
 
-            if (percent < 0) percent = 0;
-            if (percent > 1) percent = 1;
+            if (percent < 0 && isClosed)
+            {
+                percent = 0;
+                animIsPlaying = false;
+            }
+            if (percent > 1 && !isClosed)
+            {
+                percent = 1;
+                animIsPlaying = false;
+            }
 
             doorAngle = percent * 90;
-            doorArt.rotation = Quaternion.Euler(0, doorAngle, 0); // set angle of door art.
+            doorArt.rotation = Quaternion.Euler(0, doorAngle * percent, 0); // set angle of door art.
         }
     }
 
@@ -47,9 +62,33 @@ public class DoorController : MonoBehaviour
         // Destroy(gameObject);
     }
 
-    public void PlayerInteract()
+    public void PlayerInteract(Vector3 position)
     {
+        if (animIsPlaying) return;
+        // if (isClosed) isClosed = false;
+        // else isClosed = true;
+
+        Vector3 disToPlayer = position - transform.position;
+
+        disToPlayer = disToPlayer.normalized;
+
+        bool playerOnOtherSide = (Vector3.Dot(disToPlayer, transform.forward) > 0f);
+        
+        isClosed = !isClosed;
+
+        //if (!isClosed)
+        //{
+        //    doorAngle = 90;
+        //    if (playerOnOtherSide) doorAngle = -90;
+        //}
+
+        if(!isClosed) doorAngle = (playerOnOtherSide) ? -90 : 90;
+
+
         animIsPlaying = true;
-        animTimer = 0;
+
+        // set playhead to end (or beginning)
+        if (isClosed) animTimer = 0;
+        else animTimer = 0;
     }
 }
