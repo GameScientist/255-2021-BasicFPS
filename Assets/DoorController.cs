@@ -65,13 +65,16 @@ public class DoorController : MonoBehaviour
     public void PlayerInteract(Vector3 position)
     {
         if (animIsPlaying) return;
+
+        if (!Inventory.main.hasKey) return;
         // if (isClosed) isClosed = false;
         // else isClosed = true;
 
-        Vector3 disToPlayer = position - transform.position;
 
+        Vector3 disToPlayer = position - transform.position;
         disToPlayer = disToPlayer.normalized;
 
+        
         bool playerOnOtherSide = (Vector3.Dot(disToPlayer, transform.forward) > 0f);
         
         isClosed = !isClosed;
